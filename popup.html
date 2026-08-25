@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=360">
+  <title>Workspace Launcher</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup" aria-label="Workspace Launcher">
+    <header class="header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+          <span class="bar bar-3"></span>
+        </span>
+        <div class="brand-text">
+          <span class="eyebrow">Index</span>
+          <h1 class="title">Workspaces</h1>
+        </div>
+      </div>
+      <button id="saveBtn" class="save-btn" type="button" title="Save all tabs in the current window as a workspace">
+        <span class="plus" aria-hidden="true">+</span>
+        <span class="save-label">Save current</span>
+      </button>
+    </header>
+
+    <section class="list-wrap" aria-live="polite" aria-busy="false">
+      <ul id="list" class="list" role="list"></ul>
+      <div id="empty" class="empty" hidden>
+        <div class="empty-art" aria-hidden="true">
+          <span class="ghost-bar"></span>
+          <span class="ghost-bar"></span>
+          <span class="ghost-bar"></span>
+        </div>
+        <p class="empty-title">Your index is empty</p>
+        <p class="empty-hint">Save the tabs in this window to build your first workspace.</p>
+      </div>
+      <div id="error" class="error" hidden role="alert"></div>
+    </section>
+
+    <footer class="footer">
+      <span id="countLabel" class="count-label"></span>
+    </footer>
+  </main>
+
+  <dialog id="confirmDialog" class="confirm-dialog">
+    <form method="dialog" class="confirm-form">
+      <p class="confirm-title">Delete this workspace?</p>
+      <p class="confirm-body" id="confirmBody">This can't be undone.</p>
+      <div class="confirm-actions">
+        <button value="cancel" class="btn btn-ghost" type="submit">Cancel</button>
+        <button value="confirm" class="btn btn-danger" type="submit">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="popup.js"></script>
+</body>
+</html>

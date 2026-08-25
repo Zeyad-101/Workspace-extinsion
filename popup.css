@@ -1,0 +1,515 @@
+/* ============================================================
+   Workspace Launcher — popup styles
+   "Index" aesthetic: card-catalog / code-sidebar discipline.
+   - System font stack; mono only for the "data" layer
+   - Eyebrows give editorial structure without ornament
+   - Cobalt is the only chromatic note; a warm secondary lives in shadows
+   - Subtle dot-grid on the list area so the empty state isn't a void
+   - One signature element: three offset cobalt bars
+   ============================================================ */
+
+:root {
+  /* Light — paper-and-ink with a soft warm cast (deliberately not cream) */
+  --bg:        #f1efe8;
+  --bg-elev:   #fbf9f3;
+  --bg-row:    #ffffff;
+  --bg-row-hover: #fbf9f3;
+  --bg-grid:   #ece9e1;
+  --ink:       #16181d;
+  --ink-soft:  #5b606b;
+  --ink-faint: #9097a3;
+  --line:      rgba(22, 24, 29, 0.08);
+  --line-strong: rgba(22, 24, 29, 0.16);
+  --accent:    #1f4cd0;
+  --accent-hover: #1a40b3;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(31, 76, 208, 0.10);
+  --warm:      #b67a2c;   /* secondary accent — used sparingly */
+  --warm-soft: rgba(182, 122, 44, 0.10);
+  --danger:    #b8341c;
+  --danger-soft: rgba(184, 52, 28, 0.10);
+  --shadow-sm: 0 1px 0 rgba(22, 24, 29, 0.04);
+  --shadow-md: 0 8px 24px rgba(22, 24, 29, 0.08), 0 1px 0 rgba(22, 24, 29, 0.05);
+  --shadow-lift: 0 2px 0 rgba(22, 24, 29, 0.04), 0 6px 18px rgba(22, 24, 29, 0.10);
+  --radius:    10px;
+  --radius-sm: 7px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #0f1116;
+    --bg-elev:   #161922;
+    --bg-row:    #1a1e29;
+    --bg-row-hover: #20242f;
+    --bg-grid:   #14171f;
+    --ink:       #ebecf0;
+    --ink-soft:  #a3a8b3;
+    --ink-faint: #6b7080;
+    --line:      rgba(255, 255, 255, 0.07);
+    --line-strong: rgba(255, 255, 255, 0.14);
+    --accent:    #6b8eff;
+    --accent-hover: #88a3ff;
+    --accent-ink: #0a0d18;
+    --accent-soft: rgba(107, 142, 255, 0.14);
+    --warm:      #d4a14a;
+    --warm-soft: rgba(212, 161, 74, 0.14);
+    --danger:    #ff7a66;
+    --danger-soft: rgba(255, 122, 102, 0.14);
+    --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.30);
+    --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.40), 0 1px 0 rgba(0, 0, 0, 0.30);
+    --shadow-lift: 0 2px 0 rgba(0, 0, 0, 0.30), 0 6px 18px rgba(0, 0, 0, 0.45);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--bg);
+  min-width: 320px;
+  max-width: 400px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "cv11";
+}
+
+/* ---------- Layout shell ---------- */
+.popup {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  max-height: 540px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ---------- Header ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1.05;
+}
+
+/* The signature: three offset cobalt bars. Restraint is the point. */
+.brand-mark {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.brand-mark .bar {
+  position: absolute;
+  left: 0;
+  height: 2.5px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+.brand-mark .bar-1 { top: 3px;    right: 6px; }
+.brand-mark .bar-2 { top: 8px;    right: 3px; }
+.brand-mark .bar-3 { top: 13px;   right: 0;   }
+
+.eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 2px;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px 7px 9px;
+  background: var(--ink);
+  color: var(--bg-elev);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 140ms ease-out, transform 80ms ease-out, box-shadow 140ms ease-out;
+  box-shadow: var(--shadow-sm);
+}
+.save-btn:hover  { background: var(--accent); color: var(--accent-ink); }
+.save-btn:active { transform: translateY(1px); }
+.save-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.save-btn .plus {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  margin-top: -1px;
+}
+.save-btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- List area ---------- */
+.list-wrap {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--bg);
+  /* Subtle dot-grid texture: small radial dots on the grid color */
+  background-image: radial-gradient(var(--bg-grid) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: 0 0;
+  /* Soft top + bottom inner shadows for scroll affordance */
+  background-attachment: local, local, scroll, scroll;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* ---------- Workspace row ---------- */
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 11px 11px 13px;
+  background: var(--bg-row);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color 140ms ease-out,
+    border-color 140ms ease-out,
+    transform 140ms ease-out,
+    box-shadow 140ms ease-out;
+}
+.workspace:hover {
+  background: var(--bg-row-hover);
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+.workspace:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.workspace .meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* "Pinned" eyebrow shown only on pinned rows */
+.row-eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  padding: 3px 6px 3px 5px;
+  border-radius: 3px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.pinned-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.workspace .name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace .count {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.workspace .count .num {
+  color: var(--ink);
+  font-weight: 500;
+}
+.workspace .count .label {
+  color: var(--ink-faint);
+  text-transform: lowercase;
+}
+
+.workspace .actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  transition: background-color 140ms ease-out, border-color 140ms ease-out, color 140ms ease-out, transform 80ms ease-out, box-shadow 140ms ease-out;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.btn:active { transform: translateY(1px); }
+
+/* Open button — primary, with arrow that nudges on hover */
+.open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 6px 10px 6px 12px;
+  box-shadow: var(--shadow-sm);
+}
+.open-btn:hover {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-lift);
+}
+.open-arrow {
+  width: 12px;
+  height: 12px;
+  transition: transform 140ms ease-out;
+}
+.open-btn:hover .open-arrow { transform: translateX(2px); }
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: transparent;
+  color: var(--ink-faint);
+  border-radius: var(--radius-sm);
+  transition: background-color 140ms ease-out, color 140ms ease-out;
+}
+.icon-btn svg { width: 15px; height: 15px; }
+.icon-btn:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.icon-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Pin button: outline when unpinned, filled + accent when pinned */
+.pin-btn:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.pin-btn.is-pinned {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.pin-btn.is-pinned:hover {
+  background: var(--accent-soft);
+  filter: brightness(0.95);
+  color: var(--accent);
+}
+.pin-btn.is-pinned svg .pin-head { fill: currentColor; }
+.pin-btn:not(.is-pinned) svg .pin-head { fill: none; }
+
+/* Pinned row: cobalt accent rail on the left edge */
+.workspace.is-pinned {
+  border-left: 2px solid var(--accent);
+  padding-left: 12px;
+}
+
+/* ---------- Empty state ---------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 22px 32px;
+  gap: 6px;
+  color: var(--ink-soft);
+}
+.empty-art {
+  position: relative;
+  width: 44px;
+  height: 36px;
+  margin-bottom: 8px;
+}
+.empty-art .ghost-bar {
+  position: absolute;
+  left: 0;
+  height: 6px;
+  background: var(--line-strong);
+  border-radius: 2px;
+}
+.empty-art .ghost-bar:nth-child(1) { top: 0;  width: 26px; }
+.empty-art .ghost-bar:nth-child(2) { top: 14px; width: 36px; }
+.empty-art .ghost-bar:nth-child(3) { top: 28px; width: 16px; }
+.empty-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.empty-hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  max-width: 260px;
+  line-height: 1.5;
+}
+.empty-hint strong { color: var(--ink); font-weight: 600; }
+
+/* ---------- Error banner ---------- */
+.error {
+  margin: 8px 10px 0;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-soft);
+  border-radius: var(--radius-sm);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.4;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  padding: 7px 16px 9px;
+  background: var(--bg-elev);
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Confirm dialog ---------- */
+.confirm-dialog {
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 0;
+  background: var(--bg-elev);
+  color: var(--ink);
+  box-shadow: var(--shadow-md);
+  max-width: 280px;
+}
+.confirm-dialog::backdrop {
+  background: rgba(10, 12, 18, 0.50);
+  backdrop-filter: blur(2px);
+}
+.confirm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  margin: 0;
+}
+.confirm-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.confirm-body {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 6px;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border-color: var(--line);
+}
+.btn-ghost:hover { background: var(--bg-row-hover); color: var(--ink); }
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover { filter: brightness(1.08); }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
