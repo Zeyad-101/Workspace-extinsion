@@ -56,6 +56,46 @@
     </form>
   </dialog>
 
+  <!-- Save modal: replaces native prompt() with a custom flow
+       that lets the user exclude individual tabs before saving. -->
+  <dialog id="saveModal" class="save-modal" aria-labelledby="saveTitle">
+    <form class="save-form" id="saveForm">
+      <header class="save-header">
+        <span class="eyebrow save-eyebrow">New</span>
+        <h2 class="save-title" id="saveTitle">Save workspace</h2>
+      </header>
+
+      <label class="save-field">
+        <span class="save-label">Name</span>
+        <input
+          id="saveName"
+          class="name-input"
+          type="text"
+          maxlength="80"
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </label>
+
+      <label class="exclude-toggle">
+        <input id="excludeToggle" class="exclude-toggle-cb" type="checkbox">
+        <span class="exclude-toggle-text">Exclude some tabs?</span>
+      </label>
+
+      <div id="excludeSection" class="exclude-section" hidden>
+        <ul id="tabList" class="tab-list" role="list"></ul>
+        <p id="saveValidation" class="validation-msg" hidden>
+          At least one tab must be included.
+        </p>
+      </div>
+
+      <div class="save-actions">
+        <button id="cancelBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="saveOk" class="btn btn-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="popup.js"></script>
 </body>
 </html>

@@ -506,6 +506,216 @@ body {
 }
 .btn-danger:hover { filter: brightness(1.08); }
 
+/* ---------- Save modal ---------- */
+.save-modal {
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 0;
+  background: var(--bg-elev);
+  color: var(--ink);
+  box-shadow: var(--shadow-md);
+  max-width: 340px;
+  width: calc(100vw - 32px);
+}
+.save-modal::backdrop {
+  background: rgba(10, 12, 18, 0.50);
+  backdrop-filter: blur(2px);
+}
+.save-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  margin: 0;
+}
+.save-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+.save-eyebrow {
+  margin-bottom: 0;
+  color: var(--ink-faint);
+}
+.save-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* Name field */
+.save-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.save-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.name-input {
+  font: inherit;
+  font-size: 13.5px;
+  padding: 8px 10px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  transition: border-color 140ms ease-out, box-shadow 140ms ease-out;
+}
+.name-input:hover { border-color: var(--line-strong); }
+.name-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.name-input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Exclude master toggle (checkbox row) */
+.exclude-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--ink);
+  user-select: none;
+  transition: background-color 140ms ease-out, border-color 140ms ease-out;
+}
+.exclude-toggle:hover { background: var(--bg-row-hover); border-color: var(--line-strong); }
+.exclude-toggle-cb {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex: none;
+}
+.exclude-toggle-text { flex: 1; }
+
+/* Exclude section (revealed when master toggle is on) */
+.exclude-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tab-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  max-height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tab-row {
+  display: grid;
+  grid-template-columns: auto 16px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 100ms ease-out, opacity 140ms ease-out;
+}
+.tab-row:hover { background: var(--bg-row-hover); }
+.tab-row input[type="checkbox"] {
+  margin: 0;
+  width: 13px;
+  height: 13px;
+  accent-color: var(--danger);
+  cursor: pointer;
+}
+.tab-favicon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.tab-favicon img { width: 16px; height: 16px; display: block; }
+.tab-favicon-fallback {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--line-strong);
+}
+.tab-title {
+  min-width: 0;
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tab-row.is-excluded { opacity: 0.5; }
+.tab-row.is-excluded .tab-title { text-decoration: line-through; }
+
+.validation-msg {
+  margin: 0;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: 5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1.4;
+}
+
+/* Save actions */
+.save-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-lift);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--ink-faint);
+  box-shadow: none;
+}
+
+/* Bug fix: the UA `[hidden] { display: none }` rule is overridden by our
+   `.empty { display: flex }` and `.list { display: flex }` rules (same
+   specificity, author wins). Re-establish hidden as the source of truth so
+   the empty state actually disappears when there are workspaces. Same fix
+   for the modal's collapsible sections. */
+.empty[hidden],
+.list[hidden],
+.exclude-section[hidden],
+.tab-list[hidden],
+.validation-msg[hidden] { display: none; }
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   * {

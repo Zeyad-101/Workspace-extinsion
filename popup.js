@@ -29,6 +29,17 @@ const $countLabel = document.getElementById('countLabel');
 const $confirm    = document.getElementById('confirmDialog');
 const $confirmBody = document.getElementById('confirmBody');
 
+// Save modal refs
+const $saveModal      = document.getElementById('saveModal');
+const $saveForm       = document.getElementById('saveForm');
+const $saveName       = document.getElementById('saveName');
+const $excludeToggle  = document.getElementById('excludeToggle');
+const $excludeSection = document.getElementById('excludeSection');
+const $tabList        = document.getElementById('tabList');
+const $saveValidation = document.getElementById('saveValidation');
+const $saveOk         = document.getElementById('saveOk');
+const $cancelBtn      = document.getElementById('cancelBtn');
+
 // --- Utilities ---
 function isRestorable(url) {
   if (!url || typeof url !== 'string') return false;
@@ -184,7 +195,7 @@ function buildRow(ws) {
 
   const delBtn = document.createElement('button');
   delBtn.type = 'button';
-  delBtn.className = 'icon-btn';
+  delBtn.className = 'icon-btn delete-btn';
   delBtn.setAttribute('aria-label', 'Delete workspace ' + ws.name);
   delBtn.title = 'Delete';
   delBtn.innerHTML =
@@ -202,74 +213,181 @@ function buildRow(ws) {
   return li;
 }
 
-// --- Save current tabs ---
+// --- Save current tabs (via custom modal) ---
+// State for the currently open save modal. Reset every time the modal opens.
+let saveModalTabs = [];     // [{ url, title, favIconUrl, excluded }]
+let saveModalSkipped = 0;   // count of internal pages we filtered out
+
 async function saveCurrentTabs() {
   clearError();
   $saveBtn.disabled = true;
   try {
-    const tabs = await chrome.tabs.query({ currentWindow: true });
-
-    const restorable = [];
-    const skipped = [];
-    const seen = new Set();
-
-    for (const tab of tabs) {
-      if (!isRestorable(tab.url)) {
-        skipped.push(tab);
-        continue;
-      }
-      if (seen.has(tab.url)) continue;
-      seen.add(tab.url);
-      restorable.push({ url: tab.url, title: tab.title || tab.url });
-    }
-
-    if (restorable.length === 0) {
-      showError('No restorable tabs in this window (only internal pages were found).');
-      return;
-    }
-
-    const defaultName =
-      'Workspace ' +
-      new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-
-    const input = window.prompt(
-      'Name this workspace (' + restorable.length + ' ' + tabCountLabel(restorable.length) + '):',
-      defaultName
-    );
-    if (input === null) return; // user cancelled
-    const name = input.trim();
-    if (name === '') {
-      showError('Name cannot be empty.');
-      return;
-    }
-
-    const now = Date.now();
-    const newWs = {
-      id: uid(),
-      name,
-      createdAt: now,
-      updatedAt: now,
-      pinned: false,
-      tabs: restorable,
-    };
-
-    const all = await getWorkspaces();
-    all.push(newWs);
-    const ok = await setWorkspaces(all);
-    if (!ok) return;
-
-    if (skipped.length > 0) {
-      showError(
-        'Saved "' + name + '". Skipped ' + skipped.length + ' internal ' +
-        tabCountLabel(skipped.length) + ' that can’t be restored.'
-      );
-    }
-    render(all);
+    await openSaveModal();
   } catch (err) {
-    showError('Failed to save. ' + (err && err.message ? err.message : ''));
+    showError('Failed to open save dialog. ' + (err && err.message ? err.message : ''));
   } finally {
     $saveBtn.disabled = false;
   }
+}
+
+async function openSaveModal() {
+  const tabs = await chrome.tabs.query({ currentWindow: true });
+
+  const restorable = [];
+  const seen = new Set();
+  let skipped = 0;
+  for (const tab of tabs) {
+    if (!isRestorable(tab.url)) { skipped++; continue; }
+    if (seen.has(tab.url)) continue;
+    seen.add(tab.url);
+    restorable.push({
+      url: tab.url,
+      title: tab.title || tab.url,
+      favIconUrl: tab.favIconUrl || '',
+    });
+  }
+
+  if (restorable.length === 0) {
+    showError('No restorable tabs in this window (only internal pages were found).');
+    return;
+  }
+
+  saveModalTabs = restorable.map((t) => ({ ...t, excluded: false }));
+  saveModalSkipped = skipped;
+
+  // Reset form state
+  const defaultName =
+    'Workspace ' +
+    new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  $saveName.value = defaultName;
+  $excludeToggle.checked = false;
+  $excludeSection.hidden = true;
+  $saveValidation.hidden = true;
+  renderSaveTabList();
+  updateSaveOkState();
+
+  $saveModal.returnValue = '';
+  $saveModal.showModal();
+
+  // Focus the name field so the user can immediately overwrite the default.
+  // rAF isn't strictly necessary in a popup, but it lets the dialog finish
+  // its open transition before we steal focus.
+  requestAnimationFrame(() => {
+    try { $saveName.focus(); $saveName.select(); } catch (_) { /* noop in tests */ }
+  });
+}
+
+function renderSaveTabList() {
+  $tabList.innerHTML = '';
+  for (const t of saveModalTabs) {
+    const li = document.createElement('li');
+    li.className = 'tab-row' + (t.excluded ? ' is-excluded' : '');
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'tab-cb';
+    cb.setAttribute('aria-label', 'Exclude ' + t.title);
+    cb.checked = t.excluded;
+    cb.addEventListener('change', () => {
+      t.excluded = cb.checked;
+      li.classList.toggle('is-excluded', t.excluded);
+      updateSaveOkState();
+    });
+    li.appendChild(cb);
+
+    const fav = document.createElement('span');
+    fav.className = 'tab-favicon';
+    if (t.favIconUrl) {
+      const img = document.createElement('img');
+      img.src = t.favIconUrl;
+      img.alt = '';
+      img.addEventListener('error', () => {
+        // swap to a neutral fallback if the favicon 404s
+        fav.innerHTML = '';
+        const fb = document.createElement('span');
+        fb.className = 'tab-favicon-fallback';
+        fb.setAttribute('aria-hidden', 'true');
+        fav.appendChild(fb);
+      });
+      fav.appendChild(img);
+    } else {
+      const fb = document.createElement('span');
+      fb.className = 'tab-favicon-fallback';
+      fb.setAttribute('aria-hidden', 'true');
+      fav.appendChild(fb);
+    }
+    li.appendChild(fav);
+
+    const title = document.createElement('span');
+    title.className = 'tab-title';
+    title.textContent = t.title;
+    title.title = t.title; // tooltip for truncated titles
+    li.appendChild(title);
+
+    // Make the whole row clickable to toggle the checkbox.
+    li.addEventListener('click', (e) => {
+      if (e.target === cb) return; // direct checkbox click already handled
+      cb.checked = !cb.checked;
+      cb.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    $tabList.appendChild(li);
+  }
+}
+
+function updateSaveOkState() {
+  const nameOk = $saveName.value.trim() !== '';
+  const excludedCount = saveModalTabs.filter((t) => t.excluded).length;
+  const allExcluded =
+    saveModalTabs.length > 0 && excludedCount === saveModalTabs.length;
+  $saveOk.disabled = !nameOk || allExcluded;
+  $saveValidation.hidden = !allExcluded;
+}
+
+function closeSaveModal(reason) {
+  // 'cancel', 'confirm', or anything else (Escape / backdrop) — close with
+  // that returnValue so the close handler can distinguish if needed.
+  $saveModal.close(reason || 'cancel');
+}
+
+async function submitSaveModal() {
+  if ($saveOk.disabled) return; // validation: stay open, do nothing
+  const name = $saveName.value.trim();
+  if (name === '') return; // belt + suspenders (OK should already be disabled)
+
+  const tabsToSave = saveModalTabs
+    .filter((t) => !t.excluded)
+    .map((t) => ({ url: t.url, title: t.title }));
+
+  if (tabsToSave.length === 0) return; // all excluded (OK should be disabled)
+
+  const now = Date.now();
+  const newWs = {
+    id: uid(),
+    name,
+    createdAt: now,
+    updatedAt: now,
+    pinned: false,
+    tabs: tabsToSave,
+  };
+
+  const all = await getWorkspaces();
+  all.push(newWs);
+  const ok = await setWorkspaces(all);
+  if (!ok) {
+    // storage error already surfaced via showError; close so the user sees it
+    closeSaveModal('error');
+    return;
+  }
+
+  if (saveModalSkipped > 0) {
+    showError(
+      'Saved "' + name + '". Skipped ' + saveModalSkipped + ' internal ' +
+      tabCountLabel(saveModalSkipped) + ' that can’t be restored.'
+    );
+  }
+  render(all);
+  closeSaveModal('confirm');
 }
 
 // --- Open workspace ---
@@ -331,6 +449,34 @@ async function togglePin(id) {
 // --- Init ---
 async function init() {
   $saveBtn.addEventListener('click', saveCurrentTabs);
+
+  // Save modal wiring
+  $saveName.addEventListener('input', updateSaveOkState);
+  $saveName.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!$saveOk.disabled) $saveOk.click();
+    }
+  });
+  $excludeToggle.addEventListener('change', () => {
+    $excludeSection.hidden = !$excludeToggle.checked;
+    if (!$excludeSection.hidden) {
+      // Focus the first checkbox for keyboard users
+      const first = $tabList.querySelector('.tab-cb');
+      if (first) first.focus();
+    }
+  });
+  $cancelBtn.addEventListener('click', () => closeSaveModal('cancel'));
+  $saveForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitSaveModal();
+  });
+  // Backdrop click → cancel. The dialog element itself receives the click
+  // when the user clicks outside the form (i.e. on the backdrop area).
+  $saveModal.addEventListener('click', (e) => {
+    if (e.target === $saveModal) closeSaveModal('cancel');
+  });
+
   const list = await getWorkspaces();
   render(list);
 }
