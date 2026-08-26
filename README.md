@@ -12,7 +12,8 @@ A Chrome extension that saves groups of open tabs as named workspaces and reopen
 
 ## Screenshots
 
-![Workspace Launcher popup](assets/screenshot.png)
+![Empty state](assets/screenshot-empty.png)
+![Workspace list](assets/screenshot-list.png)
 
 ## Installation
 
