@@ -1,12 +1,3 @@
-/* ============================================================
-   Workspace Launcher — popup styles
-   "Index" aesthetic: card-catalog / code-sidebar discipline.
-   - System font stack; mono only for the "data" layer
-   - Eyebrows give editorial structure without ornament
-   - Cobalt is the only chromatic note; a warm secondary lives in shadows
-   - Subtle dot-grid on the list area so the empty state isn't a void
-   - One signature element: three offset cobalt bars
-   ============================================================ */
 
 :root {
   /* Light — paper-and-ink with a soft warm cast (deliberately not cream) */
@@ -705,11 +696,6 @@ body {
   box-shadow: none;
 }
 
-/* Bug fix: the UA `[hidden] { display: none }` rule is overridden by our
-   `.empty { display: flex }` and `.list { display: flex }` rules (same
-   specificity, author wins). Re-establish hidden as the source of truth so
-   the empty state actually disappears when there are workspaces. Same fix
-   for the modal's collapsible sections. */
 .empty[hidden],
 .list[hidden],
 .exclude-section[hidden],
