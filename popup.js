@@ -1,11 +1,5 @@
 'use strict';
 
-/* ============================================================
-   Workspace Launcher — popup logic
-   Storage: chrome.storage.local, single key "workspaces"
-   Schema: { id, name, createdAt, updatedAt, tabs: [{ url, title }] }
-   ============================================================ */
-
 const STORAGE_KEY = 'workspaces';
 
 // URL prefixes that chrome.tabs.create cannot restore.
